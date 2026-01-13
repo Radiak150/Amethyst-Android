@@ -50,7 +50,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="48dp"
         android:layout_marginBottom="16dp"
-        android:background="@drawable/button_ghost_background" 
+        android:background="@drawable/button_ghost_ripple_background" 
         android:text="Atualizar Modpack"
         android:textColor="@color/primary_text"
         app:layout_constraintBottom_toTopOf="@+id/play_button"
@@ -94,7 +94,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_lobby_discord"
             android:scaleType="fitCenter"
-            android:padding="12dp"/>
+            android:padding="8dp"/>
 
         <ImageButton
             android:id="@+id/lobby_controls_button"
@@ -104,7 +104,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_lobby_controls"
             android:scaleType="fitCenter"
-            android:padding="12dp"/>
+            android:padding="8dp"/>
 
         <ImageButton
             android:id="@+id/lobby_settings_button"
@@ -114,7 +114,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_lobby_settings"
             android:scaleType="fitCenter"
-            android:padding="12dp"/>
+            android:padding="8dp"/>
 
     </LinearLayout>
 
