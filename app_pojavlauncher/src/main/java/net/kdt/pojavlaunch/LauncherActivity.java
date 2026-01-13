@@ -52,6 +52,7 @@ import net.kdt.pojavlaunch.tasks.AsyncVersionList;
 import net.kdt.pojavlaunch.tasks.MinecraftDownloader;
 import net.kdt.pojavlaunch.utils.DateUtils;
 import net.kdt.pojavlaunch.utils.NotificationUtils;
+import net.kdt.pojavlaunch.value.MinecraftAccount;
 import net.kdt.pojavlaunch.value.launcherprofiles.LauncherProfiles;
 import net.kdt.pojavlaunch.value.launcherprofiles.MinecraftProfile;
 
@@ -157,7 +158,8 @@ public class LauncherActivity extends BaseActivity {
         JMinecraftVersionList.Version mcVersion = AsyncMinecraftDownloader.getListedVersion(normalizedVersionId);
 
         // Do not load when is a modded version or older than minecraft 1.3 on demo account
-        if (mAccountSpinner.getSelectedAccount().isDemo()) {
+        MinecraftAccount selectedAccount = mAccountSpinner.getSelectedAccount();
+        if (selectedAccount.isDemo() && !selectedAccount.isLocal()) {
             boolean isOlderThan13 = true;
 
             if (mcVersion != null) {

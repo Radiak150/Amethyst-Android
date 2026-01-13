@@ -24,7 +24,7 @@
         <com.kdt.mcgui.LauncherMenuButton android:id="@+id/discord_button" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
         <com.kdt.mcgui.LauncherMenuButton android:id="@+id/custom_control_button" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
         <ImageButton android:id="@+id/edit_profile_button" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-        <com.kdt.mcgui.mcVersionSpinner android:id="@+id/mc_version_spinner" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        
 
     </LinearLayout>
 
@@ -44,14 +44,27 @@
         app:layout_constraintEnd_toEndOf="parent"
         tools:ignore="ContentDescription" />
 
-    <Button
-        android:id="@+id/install_jar_button" 
+    <com.kdt.mcgui.mcVersionSpinner 
+        android:id="@+id/mc_version_spinner"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="48dp"
         android:layout_marginBottom="16dp"
         android:background="@drawable/button_ghost_ripple_background" 
-        android:text="Atualizar Modpack"
+        android:textColor="@color/primary_text"
+        app:layout_constraintBottom_toTopOf="@+id/play_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <Button
+        android:id="@+id/install_jar_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="48dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/button_ghost_ripple_background"
+        android:text="@string/main_install_jar_file"
+        android:visibility="gone"
         android:textColor="@color/primary_text"
         app:layout_constraintBottom_toTopOf="@+id/play_button"
         app:layout_constraintStart_toStartOf="parent"
@@ -79,9 +92,9 @@
         android:layout_height="80dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:weightSum="3"
+        android.weightSum="3"
         android:background="#990A0714"
-        android:paddingBottom="16dp" 
+        android:paddingBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">

@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
-    android:src="@drawable/logo_nervium_nexus"
-    android:gravity="center" />
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/background_app" />
+    <item
+        android:width="240dp"
+        android:height="240dp"
+        android:gravity="center">
+        <bitmap
+            android:gravity="fill"
+            android:src="@drawable/logo_nervium_nexus" />
+    </item>
+</layer-list>

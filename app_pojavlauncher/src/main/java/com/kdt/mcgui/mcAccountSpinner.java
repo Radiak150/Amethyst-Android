@@ -282,7 +282,7 @@ public class mcAccountSpinner extends AppCompatSpinner implements AdapterView.On
         if(!Tools.isOnline(getContext())){
             return;
         }
-        if(minecraftAccount.isLocal()) return;
+        //if(minecraftAccount.isLocal()) return;
 
         mLoginBarPaint.setColor(getResources().getColor(R.color.minebutton_color));
         if(minecraftAccount.isMicrosoft){

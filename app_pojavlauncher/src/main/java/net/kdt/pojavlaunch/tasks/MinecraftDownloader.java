@@ -86,7 +86,7 @@ public class MinecraftDownloader {
 
         sExecutorService.execute(() -> {
             try {
-                if(isLocalProfile || !isOnline) {
+                if(isLocalProfile && !isOnline) {
                     String versionMessage = realVersion; // Use provided version unless we find its a modded instance
 
                     // See if provided version is a modded version and if that version depends on another jar, check for presence of both jar's .json.
@@ -284,8 +284,14 @@ public class MinecraftDownloader {
      */
     private boolean downloadAndProcessMetadata(Activity activity, JMinecraftVersionList.Version verInfo, String versionName) throws IOException, MirrorTamperedException {
         File versionJsonFile;
-        if(verInfo != null) versionJsonFile = downloadGameJson(verInfo);
-        else versionJsonFile = createGameJsonPath(versionName);
+        if (verInfo == null) {
+            verInfo = AsyncMinecraftDownloader.getListedVersion(versionName);
+            if (verInfo == null) {
+                throw new IOException("Could not find version " + versionName + " in version manifest.");
+            }
+        }
+        versionJsonFile = downloadGameJson(verInfo);
+
         if(versionJsonFile.canRead())  {
             verInfo = Tools.GLOBAL_GSON.fromJson(Tools.read(versionJsonFile), JMinecraftVersionList.Version.class);
         } else {

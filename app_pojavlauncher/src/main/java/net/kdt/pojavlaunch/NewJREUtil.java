@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class NewJREUtil {
-    private static boolean checkInternalRuntime(AssetManager assetManager, InternalRuntime internalRuntime) {
+    private static boolean checkInternalRuntime(Activity activity, AssetManager assetManager, InternalRuntime internalRuntime) {
         String launcher_runtime_version;
         String installed_runtime_version = MultiRTUtils.readInternalRuntimeVersion(internalRuntime.name);
         try {
@@ -30,11 +30,11 @@ public class NewJREUtil {
         }
         // this implicitly checks for null, so it will unpack the runtime even if we don't have one installed
         if(!launcher_runtime_version.equals(installed_runtime_version))
-            return unpackInternalRuntime(assetManager, internalRuntime, launcher_runtime_version);
+            return unpackInternalRuntime(activity, assetManager, internalRuntime, launcher_runtime_version);
         else return true;
     }
 
-    private static boolean unpackInternalRuntime(AssetManager assetManager, InternalRuntime internalRuntime, String version) {
+    private static boolean unpackInternalRuntime(Activity activity, AssetManager assetManager, InternalRuntime internalRuntime, String version) {
         try {
             MultiRTUtils.installRuntimeNamedBinpack(
                     assetManager.open(internalRuntime.path+"/universal.tar.xz"),
@@ -43,7 +43,7 @@ public class NewJREUtil {
             MultiRTUtils.postPrepare(internalRuntime.name);
             return true;
         }catch (IOException e) {
-            Log.e("NewJREAuto", "Internal JRE unpack failed", e);
+            Tools.showError(activity, "Failed to unpack JRE", e);
             return false;
         }
     }
@@ -86,7 +86,7 @@ public class NewJREUtil {
             // If it is, check if updates are available from the APK file
             if(internalRuntime != null) {
                 // Not calling showRuntimeFail on failure here because we did, technically, find the compatible runtime
-                return checkInternalRuntime(assetManager, internalRuntime);
+                return checkInternalRuntime(activity, assetManager, internalRuntime);
             }
             return true;
         }
@@ -126,7 +126,7 @@ public class NewJREUtil {
         }
 
         // If it turns out the selected runtime is actually an internal one, attempt automatic installation or update
-        if(internalRuntime != null && !checkInternalRuntime(assetManager, internalRuntime)) {
+        if(internalRuntime != null && !checkInternalRuntime(activity, assetManager, internalRuntime)) {
             // Not calling showRuntimeFail here because we did, technically, find the compatible runtime
             return false;
         }
