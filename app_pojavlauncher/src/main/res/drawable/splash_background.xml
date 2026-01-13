@@ -1,18 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Este é um layer-list que combina nosso gradiente de fundo com o logo -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <!-- Item 1: O fundo cósmico que já criamos -->
     <item android:drawable="@drawable/background_cosmic_gradient" />
-
-    <!-- Item 2: O seu logo -->
     <item
-        android:width="240dp" 
-        android:height="240dp"
-        android:gravity="center">
-        <bitmap
-            android:gravity="fill"
-            android:src="@drawable/logo_nervium_nexus" />
-    </item>
-
+        android:drawable="@android:drawable/sym_def_app_icon" 
+        android:gravity="center"
+        android:width="100dp"
+        android:height="100dp" />
 </layer-list>
