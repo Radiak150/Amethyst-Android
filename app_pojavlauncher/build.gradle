@@ -1,5 +1,5 @@
 plugins {
-    id 'com.android.application' version '8.7.2'
+    id 'com.android.application'
 }
 
 static def getDate() { return new Date().format('yyyyMMdd') }
@@ -184,8 +184,6 @@ android {
         prefab true
         buildConfig true
     }
-
-    buildToolsVersion = '34.0.0'
 }
 
 afterEvaluate {
@@ -194,6 +192,7 @@ afterEvaluate {
 }
 
 dependencies {
+    implementation 'com.google.android.material:material:1.12.0' // NERVIUM: Adicionado para AppBarLayout
     implementation 'javax.annotation:javax.annotation-api:1.3.2'
     implementation 'commons-codec:commons-codec:1.15'
     // implementation 'com.wu-man:android-bsf-api:3.1.3'

@@ -1,15 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="control_button_color">#4CC4C4C4</color>
-    <color name="control_button_pressed_color">#4D000000</color>
+    <!-- Nervium Nexus Color Palette -->
 
-    <color name="minebutton_color">#9649b8</color>
-    <color name="background_app">#181818</color>
+    <!-- Backgrounds -->
+    <color name="background_app">#0D0A1A</color> <!-- Roxo muito escuro, quase preto -->
+    <color name="background_overlay">#1A152E</color> <!-- Roxo/Azul escuro para cards/divisórias -->
+    <color name="background_status_bar">#0A0714</color> <!-- Tom mais escuro para a barra de status -->
+    <color name="background_bottom_bar">#0A0714</color> <!-- Mesmo tom para a barra de navegação -->
+
+    <!-- Accents & Buttons -->
+    <color name="minebutton_color">#7E57C2</color> <!-- Roxo vibrante para botões principais (accent) -->
+    <color name="control_button_color">#33FFFFFF</color> <!-- Botões de controle transparentes -->
+    <color name="control_button_pressed_color">#4DFFFFFF</color> <!-- Efeito de clique mais claro -->
+
+    <!-- Text -->
+    <color name="primary_text">#F5F5F5</color> <!-- Branco suave para texto principal -->
+    <color name="secondary_text">#A09DBA</color> <!-- Cinza/Lavanda claro para texto secundário -->
+
+    <!-- Other -->
     <color name="divider">@color/background_overlay</color>
-    <color name="background_overlay">#464646</color>
-    <color name="background_status_bar">#242424</color>
-    <color name="background_bottom_bar">#232323</color>
 
-    <color name="primary_text">#FFFFFF</color>
-    <color name="secondary_text">#B2B2B2</color>
 </resources>
