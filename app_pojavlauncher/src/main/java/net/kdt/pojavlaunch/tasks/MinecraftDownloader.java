@@ -1,4 +1,4 @@
-package net.kdt.pojavlaunch.tasks;
+    package net.kdt.pojavlaunch.tasks;
 
 import static net.kdt.pojavlaunch.PojavApplication.sExecutorService;
 
@@ -273,53 +273,97 @@ public class MinecraftDownloader {
         return downloads.get("client");
     }
 
-    /**
-     * Download (if necessary) and process a version's metadata, scheduling all downloads that this
-     * version needs.
-     * @param activity Activity, used for automatic installation of JRE 17 if needed
-     * @param verInfo The JMinecraftVersionList.Version from the version list, if available
-     * @param versionName The version ID (necessary)
-     * @return false if JRE17 installation failed, true otherwise
-     * @throws IOException if the download of any of the metadata files fails
-     */
-    private boolean downloadAndProcessMetadata(Activity activity, JMinecraftVersionList.Version verInfo, String versionName) throws IOException, MirrorTamperedException {
-        File versionJsonFile;
+/**
+ * Download (if necessary) and process a version's metadata, scheduling all downloads that this
+ * version needs.
+ * @param activity Activity, used for automatic installation of JRE 17 if needed
+ * @param verInfo The JMinecraftVersionList.Version from the version list, if available
+ * @param versionName The version ID (necessary)
+ * @return false if JRE17 installation failed, true otherwise
+ * @throws IOException if the download of any of the metadata files fails
+ */
+private boolean downloadAndProcessMetadata(
+        Activity activity,
+        JMinecraftVersionList.Version verInfo,
+        String versionName
+) throws IOException, MirrorTamperedException {
+
+    File versionJsonFile = null;
+
+    // 1️⃣ Tentar JSON local primeiro (Fabric / modloaders)
+    if (verInfo == null) {
+        File localVersionDir = new File(
+        new File(Tools.DIR_GAME_HOME, "versions"),
+        versionName
+    );
+        File localJson = new File(localVersionDir, versionName + ".json");
+
+        if (localJson.exists() && localJson.canRead()) {
+            Log.i("MinecraftDownloader", "Using local version JSON for " + versionName);
+            verInfo = Tools.GLOBAL_GSON.fromJson(
+                    Tools.read(localJson),
+                    JMinecraftVersionList.Version.class
+            );
+            versionJsonFile = localJson;
+        }
+    }
+
+    // 2️⃣ Se não houver JSON local, usar manifest Mojang (vanilla)
+    if (verInfo == null) {
+        verInfo = AsyncMinecraftDownloader.getListedVersion(versionName);
         if (verInfo == null) {
-            verInfo = AsyncMinecraftDownloader.getListedVersion(versionName);
-            if (verInfo == null) {
-                throw new IOException("Could not find version " + versionName + " in version manifest.");
-            }
+            throw new IOException("Could not find version " + versionName + " in version manifest.");
         }
         versionJsonFile = downloadGameJson(verInfo);
-
-        if(versionJsonFile.canRead())  {
-            verInfo = Tools.GLOBAL_GSON.fromJson(Tools.read(versionJsonFile), JMinecraftVersionList.Version.class);
-        } else {
-            throw new IOException("Unable to read Version JSON for version " + versionName);
-        }
-
-        if(activity != null && !NewJREUtil.installNewJreIfNeeded(activity, verInfo)){
-            return false;
-        }
-
-        JAssets assets = downloadAssetsIndex(verInfo);
-        if(assets != null) scheduleAssetDownloads(assets);
-
-
-        MinecraftClientInfo minecraftClientInfo = getClientInfo(verInfo);
-        if(minecraftClientInfo != null) scheduleGameJarDownload(minecraftClientInfo, versionName);
-
-        if(verInfo.libraries != null) scheduleLibraryDownloads(verInfo.libraries);
-
-        if(verInfo.logging != null) scheduleLoggingAssetDownloadIfNeeded(verInfo.logging);
-
-        if(Tools.isValidString(verInfo.inheritsFrom)) {
-            JMinecraftVersionList.Version inheritedVersion = AsyncMinecraftDownloader.getListedVersion(verInfo.inheritsFrom);
-            // Infinite inheritance !?! :noway:
-            return downloadAndProcessMetadata(activity, inheritedVersion, verInfo.inheritsFrom);
-        }
-        return true;
     }
+
+    // 3️⃣ Garantir leitura do JSON final
+    if (versionJsonFile != null && versionJsonFile.canRead()) {
+        verInfo = Tools.GLOBAL_GSON.fromJson(
+                Tools.read(versionJsonFile),
+                JMinecraftVersionList.Version.class
+        );
+    } else {
+        throw new IOException("Unable to read Version JSON for version " + versionName);
+    }
+
+    // 4️⃣ Instalação automática do JRE, se necessário
+    if (activity != null && !NewJREUtil.installNewJreIfNeeded(activity, verInfo)) {
+        return false;
+    }
+
+    // 5️⃣ Assets
+    JAssets assets = downloadAssetsIndex(verInfo);
+    if (assets != null) {
+        scheduleAssetDownloads(assets);
+    }
+
+    // 6️⃣ Client JAR
+    MinecraftClientInfo minecraftClientInfo = getClientInfo(verInfo);
+    if (minecraftClientInfo != null) {
+        scheduleGameJarDownload(minecraftClientInfo, versionName);
+    }
+
+    // 7️⃣ Libraries
+    if (verInfo.libraries != null) {
+        scheduleLibraryDownloads(verInfo.libraries);
+    }
+
+    // 8️⃣ Logging
+    if (verInfo.logging != null) {
+        scheduleLoggingAssetDownloadIfNeeded(verInfo.logging);
+    }
+
+    // 9️⃣ Inheritance (Fabric / Forge / Quilt)
+    if (Tools.isValidString(verInfo.inheritsFrom)) {
+        JMinecraftVersionList.Version inheritedVersion =
+                AsyncMinecraftDownloader.getListedVersion(verInfo.inheritsFrom);
+        return downloadAndProcessMetadata(activity, inheritedVersion, verInfo.inheritsFrom);
+    }
+
+    return true;
+}
+
 
     private void growDownloadList(int addedElementCount) {
         mScheduledDownloadTasks.ensureCapacity(mScheduledDownloadTasks.size() + addedElementCount);
