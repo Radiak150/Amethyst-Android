@@ -288,15 +288,15 @@ private boolean downloadAndProcessMetadata(
         String versionName
 ) throws IOException, MirrorTamperedException {
 
-    File versionJsonFile = null;
+    File versionJsonFile;
 
-    // 1️⃣ Tentar JSON local primeiro (Fabric / modloaders)
+    // 1️⃣ Resolver versão (local OU manifest)
     if (verInfo == null) {
-        File localVersionDir = new File(
-        new File(Tools.DIR_GAME_HOME, "versions"),
-        versionName
-    );
-        File localJson = new File(localVersionDir, versionName + ".json");
+        // tenta JSON local
+        File localJson = new File(
+                Tools.DIR_HOME_VERSION,
+                versionName + File.separator + versionName + ".json"
+        );
 
         if (localJson.exists() && localJson.canRead()) {
             Log.i("MinecraftDownloader", "Using local version JSON for " + versionName);
@@ -304,30 +304,34 @@ private boolean downloadAndProcessMetadata(
                     Tools.read(localJson),
                     JMinecraftVersionList.Version.class
             );
-            versionJsonFile = localJson;
+        } else {
+            // fallback manifest
+            verInfo = AsyncMinecraftDownloader.getListedVersion(versionName);
+            if (verInfo == null) {
+                throw new IOException("Could not find version " + versionName + " locally or in version manifest.");
+            }
         }
     }
 
-    // 2️⃣ Se não houver JSON local, usar manifest Mojang (vanilla)
-    if (verInfo == null) {
-        verInfo = AsyncMinecraftDownloader.getListedVersion(versionName);
-        if (verInfo == null) {
-            throw new IOException("Could not find version " + versionName + " in version manifest.");
-        }
-        versionJsonFile = downloadGameJson(verInfo);
-    }
-
-    // 3️⃣ Garantir leitura do JSON final
-    if (versionJsonFile != null && versionJsonFile.canRead()) {
-        verInfo = Tools.GLOBAL_GSON.fromJson(
-                Tools.read(versionJsonFile),
-                JMinecraftVersionList.Version.class
-        );
-    } else {
+    // 2️⃣ Baixar / garantir JSON oficial
+    versionJsonFile = downloadGameJson(verInfo);
+    if (!versionJsonFile.canRead()) {
         throw new IOException("Unable to read Version JSON for version " + versionName);
     }
 
-    // 4️⃣ Instalação automática do JRE, se necessário
+    verInfo = Tools.GLOBAL_GSON.fromJson(
+            Tools.read(versionJsonFile),
+            JMinecraftVersionList.Version.class
+    );
+
+    // 3️⃣ HERANÇA PRIMEIRO (Fabric / Forge / Quilt)
+    if (Tools.isValidString(verInfo.inheritsFrom)) {
+        if (!downloadAndProcessMetadata(activity, null, verInfo.inheritsFrom)) {
+            return false;
+        }
+    }
+
+    // 4️⃣ AGORA SIM instalar JRE (versão FINAL)
     if (activity != null && !NewJREUtil.installNewJreIfNeeded(activity, verInfo)) {
         return false;
     }
@@ -354,16 +358,8 @@ private boolean downloadAndProcessMetadata(
         scheduleLoggingAssetDownloadIfNeeded(verInfo.logging);
     }
 
-    // 9️⃣ Inheritance (Fabric / Forge / Quilt)
-    if (Tools.isValidString(verInfo.inheritsFrom)) {
-        JMinecraftVersionList.Version inheritedVersion =
-                AsyncMinecraftDownloader.getListedVersion(verInfo.inheritsFrom);
-        return downloadAndProcessMetadata(activity, inheritedVersion, verInfo.inheritsFrom);
-    }
-
     return true;
 }
-
 
     private void growDownloadList(int addedElementCount) {
         mScheduledDownloadTasks.ensureCapacity(mScheduledDownloadTasks.size() + addedElementCount);
